@@ -45,10 +45,42 @@ jobs:
           fi
           COUNT="${IN_COUNT:-24}"
           echo "Generating $COUNT '$CAT' cards..."
-          curl -sS -X POST "$FN_URL" \
-            -H "Authorization: Bearer $ANON" \
-            -H "Content-Type: application/json" \
-            -d "{\"admin_token\":\"$ADMIN_TOKEN\",\"category\":\"$CAT\",\"count\":$COUNT}" \
-            | tee /tmp/out.json
-          echo
-          grep -q '"ok":true' /tmp/out.json || { echo "::error::generation failed"; exit 1; }
+
+          # Gemini answers 503 "high demand" on and off all day, and a single
+          # attempt turned that into a red run and a failure email every time
+          # it happened. The work is idempotent-ish (cards land unapproved for
+          # curation either way), so it is worth waiting out. Five attempts,
+          # backing off 30s / 60s / 120s / 240s, covers an eight-minute spike.
+          ATTEMPTS=5
+          DELAY=30
+          for i in $(seq 1 $ATTEMPTS); do
+            curl -sS -X POST "$FN_URL" \
+              -H "Authorization: Bearer $ANON" \
+              -H "Content-Type: application/json" \
+              -d "{\"admin_token\":\"$ADMIN_TOKEN\",\"category\":\"$CAT\",\"count\":$COUNT}" \
+              > /tmp/out.json 2>/tmp/err.txt || true
+            cat /tmp/out.json
+
+            if grep -q '"ok":true' /tmp/out.json; then
+              echo "::notice::generated on attempt $i"
+              exit 0
+            fi
+
+            # Only retry what is worth retrying. A bad token or a rejected
+            # payload will fail the same way five times and should say so now.
+            if ! grep -qE '503|UNAVAILABLE|high demand|429|RESOURCE_EXHAUSTED|timed? ?out|502|504' /tmp/out.json; then
+              echo "::error::generation failed and the error is not transient"
+              exit 1
+            fi
+
+            if [ "$i" -lt "$ATTEMPTS" ]; then
+              echo "upstream busy, retrying in ${DELAY}s (attempt $i of $ATTEMPTS)"
+              sleep "$DELAY"
+              DELAY=$(( DELAY * 2 ))
+            fi
+          done
+
+          # Out of attempts on a transient upstream. That is Gemini having a bad
+          # day, not this repo being broken, and tomorrow's run will pick it up.
+          echo "::warning::upstream unavailable after $ATTEMPTS attempts; skipping today's batch"
+          exit 0
