@@ -83,7 +83,7 @@ var BADGES = [
 var BADGE_E = {}; BADGES.forEach(function (b) { BADGE_E[b.key] = b.e; });
 function badgeEmoji(k) { return BADGE_E[k] || '🏷️'; }
 
-// ── TIER 1: IDENTITY ENGINE — badges become names (Goyim's canon) ────────────
+// ── TIER 1: IDENTITY ENGINE — badges become names (Vince's canon) ────────────
 // recv = badges that landed on YOUR prompts; give = badges YOU handed out.
 // Title rungs unlock at career count 5/10/20/30/40 and ★50 (apex).
 var LEVELS = [5, 10, 20, 30, 40, 50];
@@ -127,7 +127,7 @@ var GIVER_LADDERS = {
 };
 
 // COMBOS — unlock when both badges hit Lv10+ on the axis (recv for these, give for the givers).
-// Keys are the two/three badge keys sorted alphabetically + '+'. (Goyim's canon; deltas + reskins applied.)
+// Keys are the two/three badge keys sorted alphabetically + '+'. (Vince's canon; deltas + reskins applied.)
 var RECEIVER_COMBOS = {
   'bullseye+clown': 'Precision Idiot', 'bullseye+yawn': 'Captain Obvious', 'bullseye+trash': 'The Midwit', 'bullseye+chartdown': 'Snatching Defeat',
   'cap+handshake': 'Snake Oil', 'handshake+money': 'The Enabler', 'handshake+trash': 'Groupthink Garbage', 'handshake+robot': 'The NPC Hivemind',

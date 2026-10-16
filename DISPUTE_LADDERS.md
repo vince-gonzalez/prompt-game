@@ -147,7 +147,7 @@ not "I get the legal metaphor." **13 behavioral ladders, 6 rungs each (5 · 10 �
 
 ---
 
-## ★ Say-it-in-Discord tier (Goyim's picks)
+## ★ Say-it-in-Discord tier (Vince's picks)
 Convicted By Vibes · Beating The Allegations · Lore Accurate · Fact Checked Live · Free My Boy ·
 Pack Watch Judge · Crowd-Sourced Opinion · NPC Dialogue Option · Read Receipts Enabled · Opposite Day CEO
 
